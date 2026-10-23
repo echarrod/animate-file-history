@@ -143,8 +143,10 @@ else
   : "${out:=$(basename "${paths[0]%.*}")-history.gif}"
   # Every commit touching each path, following renames: "<unix time>\t<sha>\t<date>\t<path at that commit>".
   for p in "${paths[@]}"; do
-    git -C "$repo" log --follow --reverse --diff-filter=d --format='%x01%ct%x09%H%x09%cs' --name-only -- "$prefix$p" \
-      | awk -v FS='\t' '/^\001/ { sub(/^\001/, ""); c = $0; next } NF && c { print c "\t" $0; c = "" }'
+    # No --reverse: combined with --follow it stops following at the first rename. Reverse by hand instead.
+    git -C "$repo" log --follow --diff-filter=d --format='%x01%ct%x09%H%x09%cs' --name-only -- "$prefix$p" \
+      | awk -v FS='\t' '/^\001/ { sub(/^\001/, ""); c = $0; next } NF && c { print c "\t" $0; c = "" }' \
+      | awk '{ l[NR] = $0 } END { for (i = NR; i >= 1; i--) print l[i] }'
   done | sort -s -t "$(printf '\t')" -k1,1n | awk -F '\t' '!seen[$2]++' > "$work/versions.tsv"
   [ -s "$work/versions.tsv" ] || die "no history found for: ${paths[*]}"
 

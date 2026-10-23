@@ -104,6 +104,14 @@ git clone https://github.com/echarrod/skillsed.git
 ln -s "$PWD/skillsed/skills/animate-file-history" ~/.claude/skills/animate-file-history
 ```
 
+To link every skill in the repo at once (into `~/.claude/skills` and `~/.agents/skills`), run
+`skillsed/scripts/link-skills.sh`; re-run it after pulling new skills.
+
+## Model and effort
+
+Haiku at low effort is enough for images: every model and effort setting benchmarked gave the same correct output. Results and how to rerun them are in
+[`benchmarks/`](benchmarks/README.md).
+
 ## Layout
 
 - `skills/<name>/SKILL.md` - the skill (frontmatter `name` + `description`, then the body).
