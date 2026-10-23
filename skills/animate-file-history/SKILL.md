@@ -34,6 +34,10 @@ re-exported, and deleted files still belong in the story:
 git log --format= --name-only -- ':(glob,icase)**/*logo*' | sort -u
 ```
 
+Search for what the thing is *called*, not only the user's word. A logo also lives in `favicon*`,
+`apple-touch-icon*`, `*mark*`, `*lockup*`, `*wordmark*`, `*brand*` and the product's own name - early versions
+are often only in the favicon. Widen the glob list accordingly and look at what comes back.
+
 Filter to renderable types: `png jpg jpeg gif webp bmp svg` for images; `html` for static pages. Ignore
 build output and vendored copies (`dist/`, `build/`, `node_modules/`, `.next/`).
 
@@ -56,7 +60,7 @@ candidate list with commit counts (`git log --follow --oneline -- <path> | wc -l
 
 Useful options: `-s 512` or `-s 1200x800` canvas, `-f 2` frames per second, `--hold 2` seconds on the
 final frame, `--bg '#0b0b0b'` for logos drawn for dark backgrounds, `--keep DIR` to keep the frames,
-`-o x.mp4` for video. It prints `keep`/`skip` per commit and `kept N of M versions` on stderr.
+`-o x.mp4` for video, `--skip <sha>` (repeatable) to drop a version the user doesn't want. It prints `keep`/`skip` per commit and `kept N of M versions` on stderr.
 
 Paths are relative to the current directory (or `-C DIR`), like any git pathspec; run from the repo root
 and pass them as the history list above shows them. The script follows renames itself (`git log

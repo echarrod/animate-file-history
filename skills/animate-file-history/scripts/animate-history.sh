@@ -13,6 +13,7 @@
 #   --bg COLOR        canvas background, any CSS/ffmpeg colour name or hex (default white)
 #   --label           caption each frame with date and short sha (needs Chrome/Chromium)
 #   --keep DIR        keep the rendered frames in DIR
+#   --skip SHA        leave out the version from this commit (repeatable, any unique sha prefix)
 #   -C DIR            run against the git repo at DIR
 #
 # Needs: git, ffmpeg. SVG needs rsvg-convert or Chrome/Chromium. Bash 3.2 compatible.
@@ -21,7 +22,7 @@ set -euo pipefail
 die() { printf 'animate-history: %s\n' "$*" >&2; exit 1; }
 log() { printf '%s\n' "$*" >&2; }
 
-out="" size="512" fps="2" hold="2" bg="white" label=0 keep="" frames_dir="" repo="."
+skips=" " out="" size="512" fps="2" hold="2" bg="white" label=0 keep="" frames_dir="" repo="."
 paths=()
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -32,9 +33,10 @@ while [ $# -gt 0 ]; do
     --bg) bg="$2"; shift 2 ;;
     --label) label=1; shift ;;
     --keep) keep="$2"; shift 2 ;;
+    --skip) skips="$skips$2 "; shift 2 ;;
     --frames) frames_dir="$2"; shift 2 ;;
     -C) repo="$2"; shift 2 ;;
-    -h|--help) sed -n '2,18p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,19p' "$0"; exit 0 ;;
     --) shift; while [ $# -gt 0 ]; do paths+=("$1"); shift; done ;;
     -*) die "unknown option $1" ;;
     *) paths+=("$1"); shift ;;
@@ -145,6 +147,9 @@ else
   while IFS="$(printf '\t')" read -r _ sha date path; do
     seen=$((seen + 1))
     caption="$date · ${sha:0:7}"
+    for k in $skips; do
+      case "$sha" in "$k"*) log "  skip  $caption  (--skip)"; continue 2 ;; esac
+    done
     blob="$(git -C "$repo" rev-parse -q --verify "$sha:$path" 2>/dev/null)" \
       || { log "  skip  $caption  ($path missing at this commit)"; continue; }
     if [ "$blob" = "$prev_blob" ]; then log "  skip  $caption  (same bytes)"; continue; fi

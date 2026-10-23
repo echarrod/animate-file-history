@@ -29,6 +29,18 @@
 /animate-file-history all versions of our home page
 ```
 
+### In the wild: Storra
+
+<p align="center">
+  <img src="assets/storra-logo-history.gif" width="360" alt="The Storra logo evolving through 24 versions in 2026: a lowercase wordmark, black and red S monograms, then the folded-page mark and the Storra lockup in black and orange.">
+</p>
+
+<p align="center">
+  Seven months of <a href="https://github.com/storra-eng">Storra</a>'s logo, from a lowercase wordmark through
+  red S monograms to today's folded-page mark - stitched from favicons, headers and brand lockups across 27
+  commits.
+</p>
+
 The agent works out which files you mean (following renames, moves and `png` → `svg` switches across the
 whole history), pulls every version out of git, renders each one, drops versions whose pixels are identical
 to the one before, and stitches the rest into a GIF or MP4 with date and commit captions.
