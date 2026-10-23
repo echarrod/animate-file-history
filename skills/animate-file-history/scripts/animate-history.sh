@@ -66,11 +66,11 @@ work="$(mktemp -d "${TMPDIR:-/tmp}/animate-history.XXXXXX")"
 trap 'rm -rf "$work"' EXIT
 mkdir -p "$work/frames"
 
-# Fit any image onto the WxH canvas, centred, aspect preserved.
+# Fit any image onto a solid WxH canvas, centred, aspect preserved, transparency flattened onto --bg.
 fit() { # in out
-  ffmpeg -nostdin -v error -y -i "$1" -frames:v 1 \
-    -vf "scale=${W}:${H}:force_original_aspect_ratio=decrease,pad=${W}:${H}:(ow-iw)/2:(oh-ih)/2:color=${bg}" \
-    "$2"
+  ffmpeg -nostdin -v error -y -i "$1" -f lavfi -i "color=c=${bg}:s=${W}x${H}" -filter_complex \
+    "[0:v]scale=${W}:${H}:force_original_aspect_ratio=decrease[s];[1:v][s]overlay=(W-w)/2:(H-h)/2,format=rgb24" \
+    -frames:v 1 "$2"
 }
 
 # Render through Chrome: the image centred on the canvas, optional caption underneath.
@@ -85,9 +85,10 @@ chrome_render() { # in out caption
 <div style="height:${img_h}px;box-sizing:border-box;padding:16px"><img src="file://$1" style="width:100%;height:100%;object-fit:contain"></div>
 ${cap}</body></html>
 EOF
+  rm -f "$work/shot.png"
   "$CHROME" --headless=new --disable-gpu --hide-scrollbars --allow-file-access-from-files \
-    --window-size="${W},${H}" --screenshot="$work/shot.png" "file://$html" >/dev/null 2>&1 \
-    || die "Chrome failed to render $1"
+    --window-size="${W},${H}" --screenshot="$work/shot.png" "file://$html" >/dev/null 2>&1 || return 1
+  [ -s "$work/shot.png" ] || return 1
   fit "$work/shot.png" "$2"
 }
 
@@ -105,13 +106,15 @@ render() { # in out
 pixel_hash() { ffmpeg -nostdin -v error -i "$1" -f rawvideo -pix_fmt rgb24 - | cksum | cut -d' ' -f1; }
 
 kept=0 seen=0 prev=""
-add_frame() { # rendered.png source caption
+add_frame() { # rendered.png source caption [counted]
   local h; h="$(pixel_hash "$1")"
-  seen=$((seen + 1))
+  [ -n "${4:-}" ] || seen=$((seen + 1))
   if [ "$h" = "$prev" ]; then log "  skip  $3  (renders identically to the previous frame)"; return; fi
   prev="$h"; kept=$((kept + 1))
   local f; f="$work/frames/$(printf '%04d' "$kept").png"
-  if [ "$label" = 1 ]; then chrome_render "$2" "$f" "$3"; else cp "$1" "$f"; fi
+  if [ "$label" = 1 ] && ! chrome_render "$2" "$f" "$3"; then
+    log "  warn  $3  (caption render failed, using the frame without it)"; cp "$1" "$f"
+  elif [ "$label" != 1 ]; then cp "$1" "$f"; fi
   log "  keep  $3"
 }
 
@@ -119,53 +122,60 @@ if [ -n "$frames_dir" ]; then
   [ -d "$frames_dir" ] || die "no such directory $frames_dir"
   frames_dir="$(cd "$frames_dir" && pwd)"
   : "${out:=$(basename "$frames_dir")-history.gif}"
-  n=0
   for src in "$frames_dir"/*.png; do
     [ -e "$src" ] || die "no .png files in $frames_dir"
-    n=$((n + 1))
     fit "$src" "$work/r.png"
     stem="$(basename "$src" .png)"
     add_frame "$work/r.png" "$src" "$(printf '%s' "$stem" | sed 's/_/ · /g')"
   done
 else
   [ ${#paths[@]} -gt 0 ] || die "give at least one path, or --frames DIR (see --help)"
-  repo="$(cd "$repo" && git rev-parse --show-toplevel)" || die "$repo is not a git repo"
+  # Paths are relative to the -C dir (default: cwd), like git's own pathspecs; make them root-relative.
+  prefix="$(git -C "$repo" rev-parse --show-prefix)" || die "$repo is not a git repo"
+  repo="$(git -C "$repo" rev-parse --show-toplevel)"
   : "${out:=$(basename "${paths[0]%.*}")-history.gif}"
   # Every commit touching each path, following renames: "<unix time>\t<sha>\t<date>\t<path at that commit>".
   for p in "${paths[@]}"; do
-    git -C "$repo" log --follow --diff-filter=d --format='%x01%ct%x09%H%x09%cs' --name-only -- "$p" \
+    git -C "$repo" log --follow --reverse --diff-filter=d --format='%x01%ct%x09%H%x09%cs' --name-only -- "$prefix$p" \
       | awk -v FS='\t' '/^\001/ { sub(/^\001/, ""); c = $0; next } NF && c { print c "\t" $0; c = "" }'
-  done | sort -t "$(printf '\t')" -k1,1n -u > "$work/versions.tsv"
+  done | sort -s -t "$(printf '\t')" -k1,1n | awk -F '\t' '!seen[$2]++' > "$work/versions.tsv"
   [ -s "$work/versions.tsv" ] || die "no history found for: ${paths[*]}"
 
   prev_blob=""
   while IFS="$(printf '\t')" read -r _ sha date path; do
-    blob="$(git -C "$repo" rev-parse -q --verify "$sha:$path" 2>/dev/null)" || continue
+    seen=$((seen + 1))
     caption="$date · ${sha:0:7}"
-    if [ "$blob" = "$prev_blob" ]; then log "  skip  $caption  (same bytes)"; seen=$((seen + 1)); continue; fi
+    blob="$(git -C "$repo" rev-parse -q --verify "$sha:$path" 2>/dev/null)" \
+      || { log "  skip  $caption  ($path missing at this commit)"; continue; }
+    if [ "$blob" = "$prev_blob" ]; then log "  skip  $caption  (same bytes)"; continue; fi
     prev_blob="$blob"
-    ext="${path##*.}"
+    case "${path##*/}" in *.*) ext="${path##*.}" ;; *) ext=bin ;; esac
     src="$work/v.$ext"
     git -C "$repo" cat-file blob "$blob" > "$src"
     render "$src" "$work/r.png" || { log "  skip  $caption  (could not render $path)"; continue; }
-    add_frame "$work/r.png" "$src" "$caption"
+    add_frame "$work/r.png" "$src" "$caption" counted
   done < "$work/versions.tsv"
 fi
 
 [ "$kept" -gt 0 ] || die "nothing rendered"
 log "kept $kept of $seen versions"
 
-# Concat list with a duration per frame; the last frame is listed twice so its duration applies.
+# Concat list with a duration per frame. The last frame gets --hold, and is listed again because
+# the concat demuxer ignores the duration of the final entry.
 list="$work/list.txt" step="$(awk -v f="$fps" 'BEGIN { printf "%.4f", 1 / f }')"
-: > "$list"
-for f in "$work"/frames/*.png; do printf "file '%s'\nduration %s\n" "$f" "$step" >> "$list"; done
 last="$(ls "$work"/frames/*.png | tail -n 1)"
-printf "file '%s'\nduration %s\nfile '%s'\n" "$last" "$hold" "$last" >> "$list"
+: > "$list"
+for f in "$work"/frames/*.png; do
+  d="$step"; [ "$f" = "$last" ] && d="$hold"
+  printf "file '%s'\nduration %s\n" "$f" "$d" >> "$list"
+done
+printf "file '%s'\n" "$last" >> "$list"
+total="$(awk -v n="$kept" -v s="$step" -v h="$hold" 'BEGIN { printf "%.4f", (n - 1) * s + h }')"
 
 case "$out" in
   *.mp4)
     ffmpeg -nostdin -v error -y -f concat -safe 0 -i "$list" \
-      -vf "fps=30,pad=ceil(iw/2)*2:ceil(ih/2)*2,format=yuv420p" -c:v libx264 -movflags +faststart "$out" ;;
+      -vf "fps=30,pad=ceil(iw/2)*2:ceil(ih/2)*2,format=yuv420p" -c:v libx264 -movflags +faststart -t "$total" "$out" ;;
   *.gif)
     ffmpeg -nostdin -v error -y -f concat -safe 0 -i "$list" \
       -fps_mode vfr -vf "split[a][b];[a]palettegen=stats_mode=single[p];[b][p]paletteuse=new=1:dither=sierra2_4a" -loop 0 "$out" ;;

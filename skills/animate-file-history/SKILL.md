@@ -11,7 +11,8 @@ Build a GIF (or MP4) of how something looked over the life of the repo. The requ
 each one, drop versions that look the same as the one before, and stitch the rest into an animation.
 
 The bundled script does the git walking, rendering, visual dedupe and encoding:
-`scripts/animate-history.sh` (run it with `--help` for every option). Your part is choosing the files and,
+`scripts/animate-history.sh`, **relative to this skill's base directory** - not the user's repo. Below,
+`$SKILL` stands for that directory; call the script by its absolute path. `--help` lists every option. Your part is choosing the files and,
 for pages, producing the screenshots.
 
 ## 1. Check the tools
@@ -50,14 +51,15 @@ candidate list with commit counts (`git log --follow --oneline -- <path> | wc -l
 ## 3a. Images: run the script
 
 ```bash
-scripts/animate-history.sh -o logo-history.gif --label <path> [<older-path> ...]
+"$SKILL/scripts/animate-history.sh" -o logo-history.gif --label <path> [<older-path> ...]
 ```
 
 Useful options: `-s 512` or `-s 1200x800` canvas, `-f 2` frames per second, `--hold 2` seconds on the
 final frame, `--bg '#0b0b0b'` for logos drawn for dark backgrounds, `--keep DIR` to keep the frames,
 `-o x.mp4` for video. It prints `keep`/`skip` per commit and `kept N of M versions` on stderr.
 
-Pass paths as they appear in the history list above - the script follows renames itself (`git log
+Paths are relative to the current directory (or `-C DIR`), like any git pathspec; run from the repo root
+and pass them as the history list above shows them. The script follows renames itself (`git log
 --follow`), so the current path alone is usually enough unless the file was re-created under a new name.
 
 ## 3b. Pages: screenshot each version, then run the script on the folder
@@ -71,21 +73,26 @@ git log --format='%H %cs' --reverse -- <page file> <its components/styles dirs>
 ```
 
 If that is more than ~40 commits, sample (one per week or month, plus the first and last) and say so.
-For each chosen commit, check it out in a throwaway worktree and screenshot it into one folder, named
+For each chosen commit, export a clean snapshot with `git archive` (no worktree, nothing to clean up in the
+repo) and screenshot it into one folder, named
 `<YYYY-MM-DD>_<short-sha>.png` so files sort by date and the name becomes the caption:
 
-- **Static HTML**: no build. `git worktree add --detach "$tmp/wt" <sha>`, then
-  `"$CHROME" --headless=new --hide-scrollbars --window-size=1280,800 --screenshot="$shots/<date>_<sha>.png" "file://$tmp/wt/<page>.html"`.
-- **Framework page** (React, Next, Vue, Astro, ...): it must be built to render. In the worktree install
+```bash
+snap="$tmp/<sha>"; mkdir -p "$snap" && git archive <sha> | tar -x -C "$snap"
+```
+
+- **Static HTML**: no build. Screenshot the file:
+  `"$CHROME" --headless=new --hide-scrollbars --window-size=1280,800 --screenshot="$shots/<date>_<sha>.png" "file://$snap/<page>.html"`.
+- **Framework page** (React, Next, Vue, Astro, ...): it must be built to render. In the snapshot install
   dependencies, start the dev server or build, wait for the port, screenshot the route the same way
   (`http://localhost:<port>/<route>`), then stop the server. Old commits often fail to install or build
   (lockfile drift, removed packages, missing env) - skip those, count them, and report how many were
   skipped. Ask before running this if it means more than a handful of installs; it can take a while.
 
-Remove every worktree afterwards (`git worktree remove --force "$tmp/wt"`). Then:
+Delete each snapshot once it is screenshotted (`rm -rf "$snap"`), and keep `$tmp` outside the repo. Then:
 
 ```bash
-scripts/animate-history.sh --frames "$shots" -s 1280x800 --label -o home-page-history.gif
+"$SKILL/scripts/animate-history.sh" --frames "$shots" -s 1280x800 --label -o home-page-history.gif
 ```
 
 Identical screenshots are dropped the same way as identical images. Use a fixed window size for every
