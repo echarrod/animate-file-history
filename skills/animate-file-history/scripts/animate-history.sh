@@ -10,6 +10,7 @@
 #   -s, --size N|WxH  canvas size (default 512)
 #   -t, --frame-time S  seconds each version is shown (default 0.25)
 #   -f, --fps N       alternative to --frame-time: versions per second
+#                     (default 0.25s per version; 0.8s with --frames, as full pages need time to read)
 #   --hold N          seconds to hold the final frame (default 1.5)
 #   --bg COLOR        canvas background, any CSS/ffmpeg colour name or hex (default white)
 #   --label           caption each frame with date and short sha (needs Chrome/Chromium)
@@ -24,7 +25,7 @@ set -euo pipefail
 die() { printf 'animate-history: %s\n' "$*" >&2; exit 1; }
 log() { printf '%s\n' "$*" >&2; }
 
-skips=" " out="" size="512" frame_time="0.25" hold="1.5" bg="white" label=0 keep_blank=0 keep="" frames_dir="" repo="."
+skips=" " out="" size="512" frame_time="" hold="1.5" bg="white" label=0 keep_blank=0 keep="" frames_dir="" repo="."
 paths=()
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -183,7 +184,7 @@ log "kept $kept of $seen versions"
 
 # Concat list with a duration per frame. The last frame gets --hold, and is listed again because
 # the concat demuxer ignores the duration of the final entry.
-list="$work/list.txt" step="$frame_time"
+list="$work/list.txt" step="${frame_time:-$([ -n "$frames_dir" ] && echo 0.8 || echo 0.25)}"
 last="$(ls "$work"/frames/*.png | tail -n 1)"
 : > "$list"
 for f in "$work"/frames/*.png; do

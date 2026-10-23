@@ -58,7 +58,7 @@ candidate list with commit counts (`git log --follow --oneline -- <path> | wc -l
 "$SKILL/scripts/animate-history.sh" -o logo-history.gif --label <path> [<older-path> ...]
 ```
 
-Useful options: `-s 512` or `-s 1200x800` canvas, `-t 0.25` seconds per version (default; use the user's value if
+Useful options: `-s 512` or `-s 1200x800` canvas, `-t 0.25` seconds per version (default for images; page screenshots via `--frames` default to 0.8; use the user's value if
 they gave one, e.g. "0.5s per frame" → `-t 0.5`), `--hold 1.5` seconds on the final frame, `--bg '#0b0b0b'` for logos drawn for dark backgrounds, `--keep DIR` to keep the frames,
 `-o x.mp4` for video, `--skip <sha>` (repeatable) to drop a version the user doesn't want. It prints `keep`/`skip` per commit and `kept N of M versions` on stderr.
 
@@ -125,7 +125,7 @@ When the logo lives in more than one repo (an app, a dashboard, a website), run 
 `--keep <dir>` and no `--label`, then copy each kept frame into one folder named
 `<YYYY-MM-DD>_<repo>-<short-sha>.png` - the `keep` lines on stderr give the date and sha of each kept frame in
 order. Add `-2`, `-3` to names that collide (several files changed in one commit). Then run
-`--frames <folder> --label` on the merged folder for one timeline across all of them.
+`--frames <folder> --label -t 0.25` on the merged folder for one timeline across all of them.
 
 ## 4. Report
 

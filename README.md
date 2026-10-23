@@ -62,7 +62,7 @@ them on, or run the engine by hand:
 
 | Option | Default | What it does |
 |---|---|---|
-| `-t, --frame-time S` | `0.25` | Seconds each version is shown (`-f, --fps N` sets versions per second instead) |
+| `-t, --frame-time S` | `0.25` (`0.8` with `--frames`) | Seconds each version is shown (`-f, --fps N` sets versions per second instead) |
 | `--hold S` | `1.5` | Seconds to hold the final version |
 | `-o, --out FILE` | `<name>-history.gif` | Output file; `.gif` or `.mp4` |
 | `-s, --size N\|WxH` | `512` | Canvas size; every version is centred on it |
