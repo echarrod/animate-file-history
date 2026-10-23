@@ -1,7 +1,7 @@
 <h1 align="center">skillsed</h1>
 
 <p align="center">
-  <em>Small, sharp agent skills. Ask in plain English; get something you can show people.</em>
+  <em>Skills by Ed</em>
 </p>
 
 <p align="center">
