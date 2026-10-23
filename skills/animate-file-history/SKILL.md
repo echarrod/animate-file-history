@@ -1,7 +1,7 @@
 ---
 name: animate-file-history
 description: Turn a file's git history into an animation, one frame per visually different version - a logo's evolution, a page's redesigns. Use when asked to animate, replay or show the evolution of a logo, image, icon or web page over time.
-argument-hint: <what to animate, e.g. all images matching "logo" | our home page>
+argument-hint: <what to animate, e.g. all images matching "logo" | our home page> [frame time, e.g. 0.5s per frame]
 ---
 
 # animate-file-history
@@ -58,8 +58,8 @@ candidate list with commit counts (`git log --follow --oneline -- <path> | wc -l
 "$SKILL/scripts/animate-history.sh" -o logo-history.gif --label <path> [<older-path> ...]
 ```
 
-Useful options: `-s 512` or `-s 1200x800` canvas, `-f 2` frames per second, `--hold 2` seconds on the
-final frame, `--bg '#0b0b0b'` for logos drawn for dark backgrounds, `--keep DIR` to keep the frames,
+Useful options: `-s 512` or `-s 1200x800` canvas, `-t 0.25` seconds per version (default; use the user's value if
+they gave one, e.g. "0.5s per frame" → `-t 0.5`), `--hold 1.5` seconds on the final frame, `--bg '#0b0b0b'` for logos drawn for dark backgrounds, `--keep DIR` to keep the frames,
 `-o x.mp4` for video, `--skip <sha>` (repeatable) to drop a version the user doesn't want. It prints `keep`/`skip` per commit and `kept N of M versions` on stderr.
 
 Paths are relative to the current directory (or `-C DIR`), like any git pathspec; run from the repo root

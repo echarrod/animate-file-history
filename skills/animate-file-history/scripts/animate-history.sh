@@ -8,8 +8,9 @@
 # Options:
 #   -o, --out FILE    output .gif or .mp4 (default: <first-path-stem>-history.gif)
 #   -s, --size N|WxH  canvas size (default 512)
-#   -f, --fps N       frames per second (default 2)
-#   --hold N          seconds to hold the final frame (default 2)
+#   -t, --frame-time S  seconds each version is shown (default 0.25)
+#   -f, --fps N       alternative to --frame-time: versions per second
+#   --hold N          seconds to hold the final frame (default 1.5)
 #   --bg COLOR        canvas background, any CSS/ffmpeg colour name or hex (default white)
 #   --label           caption each frame with date and short sha (needs Chrome/Chromium)
 #   --keep DIR        keep the rendered frames in DIR
@@ -22,13 +23,14 @@ set -euo pipefail
 die() { printf 'animate-history: %s\n' "$*" >&2; exit 1; }
 log() { printf '%s\n' "$*" >&2; }
 
-skips=" " out="" size="512" fps="2" hold="2" bg="white" label=0 keep="" frames_dir="" repo="."
+skips=" " out="" size="512" frame_time="0.25" hold="1.5" bg="white" label=0 keep="" frames_dir="" repo="."
 paths=()
 while [ $# -gt 0 ]; do
   case "$1" in
     -o|--out) out="$2"; shift 2 ;;
     -s|--size) size="$2"; shift 2 ;;
-    -f|--fps) fps="$2"; shift 2 ;;
+    -t|--frame-time) frame_time="$2"; shift 2 ;;
+    -f|--fps) frame_time="$(awk -v f="$2" 'BEGIN { printf "%.4f", 1 / f }')"; shift 2 ;;
     --hold) hold="$2"; shift 2 ;;
     --bg) bg="$2"; shift 2 ;;
     --label) label=1; shift ;;
@@ -36,7 +38,7 @@ while [ $# -gt 0 ]; do
     --skip) skips="$skips$2 "; shift 2 ;;
     --frames) frames_dir="$2"; shift 2 ;;
     -C) repo="$2"; shift 2 ;;
-    -h|--help) sed -n '2,19p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,20p' "$0"; exit 0 ;;
     --) shift; while [ $# -gt 0 ]; do paths+=("$1"); shift; done ;;
     -*) die "unknown option $1" ;;
     *) paths+=("$1"); shift ;;
@@ -167,7 +169,7 @@ log "kept $kept of $seen versions"
 
 # Concat list with a duration per frame. The last frame gets --hold, and is listed again because
 # the concat demuxer ignores the duration of the final entry.
-list="$work/list.txt" step="$(awk -v f="$fps" 'BEGIN { printf "%.4f", 1 / f }')"
+list="$work/list.txt" step="$frame_time"
 last="$(ls "$work"/frames/*.png | tail -n 1)"
 : > "$list"
 for f in "$work"/frames/*.png; do
