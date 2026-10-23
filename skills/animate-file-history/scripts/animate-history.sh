@@ -14,6 +14,7 @@
 #   --bg COLOR        canvas background, any CSS/ffmpeg colour name or hex (default white)
 #   --label           caption each frame with date and short sha (needs Chrome/Chromium)
 #   --keep DIR        keep the rendered frames in DIR
+#   --keep-blank      keep frames that are one flat colour (skipped by default)
 #   --skip SHA        leave out the version from this commit (repeatable, any unique sha prefix)
 #   -C DIR            run against the git repo at DIR
 #
@@ -23,7 +24,7 @@ set -euo pipefail
 die() { printf 'animate-history: %s\n' "$*" >&2; exit 1; }
 log() { printf '%s\n' "$*" >&2; }
 
-skips=" " out="" size="512" frame_time="0.25" hold="1.5" bg="white" label=0 keep="" frames_dir="" repo="."
+skips=" " out="" size="512" frame_time="0.25" hold="1.5" bg="white" label=0 keep_blank=0 keep="" frames_dir="" repo="."
 paths=()
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -35,6 +36,7 @@ while [ $# -gt 0 ]; do
     --bg) bg="$2"; shift 2 ;;
     --label) label=1; shift ;;
     --keep) keep="$2"; shift 2 ;;
+    --keep-blank) keep_blank=1; shift ;;
     --skip) skips="$skips$2 "; shift 2 ;;
     --frames) frames_dir="$2"; shift 2 ;;
     -C) repo="$2"; shift 2 ;;
@@ -113,9 +115,16 @@ render() { # in out
 pixel_hash() { ffmpeg -nostdin -v error -i "$1" -f rawvideo -pix_fmt rgb24 - | cksum | cut -d' ' -f1; }
 
 kept=0 seen=0 prev=""
+# A frame that is one flat colour (a page that failed to render, an empty or fully transparent image).
+is_blank() { # rendered.png
+  ffmpeg -v error -i "$1" -vf "scale=32:20,format=gray" -f rawvideo - 2>/dev/null | od -An -v -tu1 | tr -s ' \n' '\n' \
+    | awk 'NF { n++; s += $1; q += $1 * $1 } END { m = s / n; exit !(n > 0 && q / n - m * m < 1) }'
+}
+
 add_frame() { # rendered.png source caption [counted]
   local h; h="$(pixel_hash "$1")"
   [ -n "${4:-}" ] || seen=$((seen + 1))
+  if [ "$keep_blank" != 1 ] && is_blank "$1"; then log "  skip  $3  (blank: one flat colour; --keep-blank to keep)"; return; fi
   if [ "$h" = "$prev" ]; then log "  skip  $3  (renders identically to the previous frame)"; return; fi
   prev="$h"; kept=$((kept + 1))
   local f; f="$work/frames/$(printf '%04d' "$kept").png"

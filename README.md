@@ -46,11 +46,13 @@ to the one before, and stitches the rest into a GIF or MP4 with date and commit 
 
 - **Logos, icons, images**: `png`, `jpg`, `webp`, `gif`, `bmp`, `svg`.
 - **Web pages**: static HTML is screenshotted at each commit; framework pages (React, Next, Vue, ...) are
-  built and screenshotted in throwaway worktrees, sampled when the history is long.
+  installed from each commit's own lockfile, run and screenshotted with Playwright once images have loaded,
+  sampled when the history is long. Blank and error pages (and flat-colour frames) are skipped, and images the
+  dev server can't serve can be fetched from your production site.
 - **Visual dedupe**: compared on rendered pixels, not bytes, so only real visual changes become frames.
 
 Needs `git` and `ffmpeg`. SVGs need `rsvg-convert` or Chrome/Chromium; captions and pages need
-Chrome/Chromium.
+Chrome/Chromium; framework pages also need `playwright-core` (the app's own install is used if it has one).
 
 ### Options
 
@@ -66,6 +68,7 @@ them on, or run the engine by hand:
 | `-s, --size N\|WxH` | `512` | Canvas size; every version is centred on it |
 | `--bg COLOR` | `white` | Canvas background, also fills transparent areas |
 | `--label` | off | Caption each frame with its commit date and short sha |
+| `--keep-blank` | off | Keep frames that are one flat colour (skipped by default) |
 | `--skip SHA` | - | Leave out one version; repeatable |
 | `--keep DIR` | - | Keep the rendered frames as PNGs |
 | `--frames DIR` | - | Animate a folder of pre-rendered PNGs (page screenshots, or frames merged from several repos) |

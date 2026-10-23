@@ -68,7 +68,7 @@ and pass them as the history list above shows them. The script follows renames i
 
 ## 3b. Pages: screenshot each version, then run the script on the folder
 
-A page needs rendering at each commit, which the script can't do for you. Find the page's source
+A page needs rendering at each commit. Find the page's source
 (`index.html`, `app/page.tsx`, `src/pages/index.vue`, ...) and list the commits that touched it **or what it
 renders** - a home page's look also changes through its components and CSS:
 
@@ -77,29 +77,46 @@ git log --format='%H %cs' --reverse -- <page file> <its components/styles dirs>
 ```
 
 If that is more than ~40 commits, sample (one per week or month, plus the first and last) and say so.
-For each chosen commit, export a clean snapshot with `git archive` (no worktree, nothing to clean up in the
-repo) and screenshot it into one folder, named
-`<YYYY-MM-DD>_<short-sha>.png` so files sort by date and the name becomes the caption:
+Screenshots go in one folder named `<YYYY-MM-DD>_<short-sha>.png`, so files sort by date and the name becomes
+the caption.
 
-```bash
-snap="$tmp/<sha>"; mkdir -p "$snap" && git archive <sha> | tar -x -C "$snap"
-```
+- **Static HTML**: no build. Export the commit with `git archive <sha> | tar -x -C "$snap"` and screenshot the
+  file with `"$CHROME" --headless=new --hide-scrollbars --window-size=1280,800 --screenshot=... "file://$snap/<page>.html"`.
+  Delete `$snap` afterwards and keep it outside the repo.
+- **Framework page** (React, Next, Vue, Astro, ...): it must run to render. Use `snapshot-commit.sh` per commit:
 
-- **Static HTML**: no build. Screenshot the file:
-  `"$CHROME" --headless=new --hide-scrollbars --window-size=1280,800 --screenshot="$shots/<date>_<sha>.png" "file://$snap/<page>.html"`.
-- **Framework page** (React, Next, Vue, Astro, ...): it must be built to render. In the snapshot install
-  dependencies, start the dev server or build, wait for the port, screenshot the route the same way
-  (`http://localhost:<port>/<route>`), then stop the server. Old commits often fail to install or build
-  (lockfile drift, removed packages, missing env) - skip those, count them, and report how many were
-  skipped. Ask before running this if it means more than a handful of installs; it can take a while.
+  ```bash
+  "$SKILL/scripts/snapshot-commit.sh" -C <repo> -r /<route> -f https://<production site> <sha> "$shots"
+  ```
 
-Delete each snapshot once it is screenshotted (`rm -rf "$snap"`), and keep `$tmp` outside the repo. Then:
+  It exports the commit, installs **that commit's own lockfile** (cached per lockfile), starts the dev server
+  (`-d 'cmd with {port}'` if it isn't `npm run dev -- --port {port}`), and screenshots through Playwright
+  (`scripts/screenshot-page.mjs`, needs `playwright-core` and Chrome - the repo's own is found via
+  `PLAYWRIGHT_DIR`). It waits for network idle and every `<img>`, dismisses a cookie banner, and prints one
+  line: `ok`, `blank`, `error` (an error page such as "couldn't load in this browser") or `fail` (install or dev
+  server). Only `ok` writes a PNG. Ask before running this if it means more than a handful of installs.
+
+Check the results before animating, don't trust `ok` alone:
+
+- **Never borrow the current `node_modules`.** Old commits import packages the current tree dropped (e.g.
+  `react-router-dom`), and the page renders blank. That is why the script installs per commit.
+- **`blank` / `error` / `fail` commits**: look at the dev log, try once to fix the cause (a missing env var, a
+  wrong `-d` command, `--ignore-scripts` skipping a needed build step), otherwise skip the commit and say how many.
+- **Broken images** (`broken-images=N` on the `ok` line, with the URLs): assets the dev server can't serve
+  (platform-hosted paths like `/__l5e/...`, gitignored or uploaded files). `-f <production site>` fetches them
+  from prod. If images are still broken, say so in the report - don't ship a GIF full of empty boxes silently.
+  Fix on the fly rather than reporting afterwards.
+- Look at a contact sheet of the frames (`ffmpeg -pattern_type glob -i '*.png' -vf scale=320:-1,tile=6x6 -frames:v 1 sheet.png`)
+  before the final run.
+
+Then:
 
 ```bash
 "$SKILL/scripts/animate-history.sh" --frames "$shots" -s 1280x800 --label -o home-page-history.gif
 ```
 
-Identical screenshots are dropped the same way as identical images. Use a fixed window size for every
+Identical screenshots are dropped the same way as identical images, and so are blank (one flat colour) ones
+(`--keep-blank` to keep them). Use a fixed window size for every
 shot, and prefer `-o x.mp4` for long or detailed pages - GIFs of full pages get large.
 
 ## 3c. Across several repos
