@@ -13,3 +13,10 @@ never commit credentials, personal data, private paths or anything specific to a
 - `skills/<name>/references/` - supporting detail loaded on demand.
 - `skills/<name>/scripts/` - executable helpers the skill runs.
 - `.claude-plugin/` - marketplace + plugin manifests so the repo installs as a Claude Code plugin.
+
+## Keep the README in step
+
+The README is the public face of every skill. Any change to a skill's behaviour, options, defaults, install
+path or examples updates `README.md` in the same commit - including the options table and the example GIFs
+in `assets/` when their output would now look different. Before committing, diff the skill's `--help` (or
+SKILL.md options) against the README and fix any drift.

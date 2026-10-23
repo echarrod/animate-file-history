@@ -101,7 +101,10 @@ render() { # in out
     svg)
       if command -v rsvg-convert >/dev/null; then
         rsvg-convert -w "$W" -h "$H" --keep-aspect-ratio -o "$work/svg.png" "$1" && fit "$work/svg.png" "$2"
-      elif [ -n "$CHROME" ]; then chrome_render "$1" "$2" ""
+      elif [ -n "$CHROME" ]; then
+        # Chrome draws a broken-image icon for invalid SVG instead of failing, so check it parses first.
+        if command -v xmllint >/dev/null && ! xmllint --noout "$1" 2>/dev/null; then return 1; fi
+        chrome_render "$1" "$2" ""
       else die "SVG needs rsvg-convert (brew install librsvg) or Chrome/Chromium"; fi ;;
     *) fit "$1" "$2" ;;
   esac

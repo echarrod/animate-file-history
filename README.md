@@ -16,7 +16,7 @@
 ## animate-file-history
 
 <p align="center">
-  <img src="assets/demo.gif" width="360" alt="A logo evolving through five versions from 2019 to 2025: a serif wordmark in a box, a blue rounded square, a purple-pink gradient square, the same gradient as a circle, and a teal-green circle with a play icon. Each frame is captioned with its commit date and short sha.">
+  <img src="assets/demo.gif" width="360" alt="A made-up Acme logo evolving through ten versions from 2015 to 2026: a monospace wordmark, a red playful script, a serif wordmark in a box, an inverted italic, a blue rounded square, a blue 'a' monogram, a purple-pink gradient square and circle, a teal-green circle with a play icon, and finally an outlined version. Each frame is captioned with its commit date and short sha.">
 </p>
 
 <p align="center">
@@ -53,9 +53,24 @@ to the one before, and stitches the rest into a GIF or MP4 with date and commit 
 Needs `git` and `ffmpeg`. SVGs need `rsvg-convert` or Chrome/Chromium; captions and pages need
 Chrome/Chromium.
 
-The engine is a plain bash script you can also run by hand:
-[`skills/animate-file-history/scripts/animate-history.sh`](skills/animate-file-history/scripts/animate-history.sh)
-(`--help` for options).
+### Options
+
+Say them in the request (`/animate-file-history our logo, 0.5s per frame, as an mp4`) and the agent passes
+them on, or run the engine by hand:
+[`skills/animate-file-history/scripts/animate-history.sh`](skills/animate-file-history/scripts/animate-history.sh).
+
+| Option | Default | What it does |
+|---|---|---|
+| `-t, --frame-time S` | `0.25` | Seconds each version is shown (`-f, --fps N` sets versions per second instead) |
+| `--hold S` | `1.5` | Seconds to hold the final version |
+| `-o, --out FILE` | `<name>-history.gif` | Output file; `.gif` or `.mp4` |
+| `-s, --size N\|WxH` | `512` | Canvas size; every version is centred on it |
+| `--bg COLOR` | `white` | Canvas background, also fills transparent areas |
+| `--label` | off | Caption each frame with its commit date and short sha |
+| `--skip SHA` | - | Leave out one version; repeatable |
+| `--keep DIR` | - | Keep the rendered frames as PNGs |
+| `--frames DIR` | - | Animate a folder of pre-rendered PNGs (page screenshots, or frames merged from several repos) |
+| `-C DIR` | cwd | Run against the git repo at `DIR` |
 
 ## Install
 

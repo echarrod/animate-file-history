@@ -102,6 +102,14 @@ Delete each snapshot once it is screenshotted (`rm -rf "$snap"`), and keep `$tmp
 Identical screenshots are dropped the same way as identical images. Use a fixed window size for every
 shot, and prefer `-o x.mp4` for long or detailed pages - GIFs of full pages get large.
 
+## 3c. Across several repos
+
+When the logo lives in more than one repo (an app, a dashboard, a website), run the script in each repo with
+`--keep <dir>` and no `--label`, then copy each kept frame into one folder named
+`<YYYY-MM-DD>_<repo>-<short-sha>.png` - the `keep` lines on stderr give the date and sha of each kept frame in
+order. Add `-2`, `-3` to names that collide (several files changed in one commit). Then run
+`--frames <folder> --label` on the merged folder for one timeline across all of them.
+
 ## 4. Report
 
 Give the output path, how many versions were found and how many made it into the animation, the date
