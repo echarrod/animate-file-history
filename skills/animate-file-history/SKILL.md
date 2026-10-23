@@ -129,3 +129,28 @@ asked.
 - **Shallow clones** (CI, `--depth 1`) have no history. Check `git rev-parse --is-shallow-repository` and
   suggest `git fetch --unshallow` if it prints `true`.
 - **Captions** need Chrome/Chromium because the bundled ffmpeg builds often lack `drawtext`.
+
+## Model and effort
+
+The judgement here is small (pick files, group lineages, choose a sample); the heavy lifting is the script and
+shell loops. Default to **Sonnet on low effort**. Opus or higher effort buys nothing for this task, and a fork
+or subagent is unnecessary. Raise effort only when lineage grouping is genuinely ambiguous.
+
+Most of a run's tokens are the session's inherited context (CLAUDE.md, skill and tool lists, ~100k+), re-read
+from cache each turn, not the work itself. A run in a lean session costs far less than one in a loaded one.
+
+### Benchmarks
+
+Measure with the session transcript (sums `usage` over assistant turns):
+
+```bash
+f=$(ls -t ~/.claude/projects/<project-dir>/*.jsonl | head -1)
+jq -s '[.[]|select(.message.usage)|.message.usage]|{turns:length,out:(map(.output_tokens)|add),cache_read:(map(.cache_read_input_tokens)|add),cache_create:(map(.cache_creation_input_tokens)|add)}' "$f"
+```
+
+| Date | Model / effort | Task | Turns | Output tok | Cache read | Cache create | Result |
+|---|---|---|---|---|---|---|---|
+| 2026-10-23 | Sonnet 5.5 / low | storra home page, discovery only (before rendering) | 9 | 3.6k | 731k | 134k | files + route history found in ~7 calls |
+
+Add a row per run (full run, not just discovery); compare Opus / higher effort only if a Sonnet-low run
+gets the lineage or sampling wrong.
