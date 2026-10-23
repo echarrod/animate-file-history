@@ -1,0 +1,17 @@
+{
+  "name": "skillsed",
+  "owner": {
+    "name": "Ed Harrod"
+  },
+  "metadata": {
+    "description": "Ed's public agent skills."
+  },
+  "plugins": [
+    {
+      "name": "skillsed",
+      "source": "./",
+      "description": "Ed's public agent skills, starting with animate-file-history: turn a logo's or page's git history into an animation.",
+      "category": "productivity"
+    }
+  ]
+}

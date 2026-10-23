@@ -1,0 +1,9 @@
+{
+  "name": "skillsed",
+  "description": "Ed's public agent skills.",
+  "author": {
+    "name": "Ed Harrod"
+  },
+  "homepage": "https://github.com/echarrod/skillsed",
+  "license": "MIT"
+}
