@@ -5,7 +5,6 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/github/stars/echarrod/skillsed?style=flat-square&color=111111&label=stars" alt="Stars">
   <img src="https://img.shields.io/badge/Claude%20Code-plugin-111111?style=flat-square" alt="Claude Code plugin">
   <img src="https://img.shields.io/badge/works%20with-any%20SKILL.md%20agent-111111?style=flat-square" alt="Works with any SKILL.md agent">
   <img src="https://img.shields.io/badge/license-MIT-111111?style=flat-square" alt="MIT license">
