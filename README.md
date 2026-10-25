@@ -40,6 +40,18 @@
   commits.
 </p>
 
+### In the wild: Givr, from two repos
+
+<p align="center">
+  <img src="assets/givr-logo-history.gif" width="360" alt="The Givr logo evolving through 8 versions from October 2024 to March 2026: a green app icon with a white wordmark, a dark wordmark with a swooping g, light and dark variants, and the standalone g monogram in green and dark.">
+</p>
+
+<p align="center">
+  <a href="https://github.com/givr-eng">Givr</a>'s logo lives in two repos, the iOS app and the web app. Run the skill
+  in each, then merge the frames by date into one timeline: eight versions from October 2024 to March 2026, with
+  repeated logos dropped.
+</p>
+
 The agent works out which files you mean (following renames, moves and `png` → `svg` switches across the
 whole history), pulls every version out of git, renders each one, drops versions whose pixels are identical
 to the one before, and stitches the rest into a GIF or MP4 with date and commit captions.
