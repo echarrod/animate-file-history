@@ -1,16 +1,16 @@
 {
-  "name": "skillsed",
+  "name": "animate-file-history",
   "owner": {
     "name": "Ed Harrod"
   },
   "metadata": {
-    "description": "Ed's public agent skills."
+    "description": "Turn a file's git history into an animation."
   },
   "plugins": [
     {
-      "name": "skillsed",
+      "name": "animate-file-history",
       "source": "./",
-      "description": "Ed's public agent skills, starting with animate-file-history: turn a logo's or page's git history into an animation.",
+      "description": "Turn a logo's, image's or web page's git history into an animation, one frame per visually different version.",
       "category": "productivity"
     }
   ]

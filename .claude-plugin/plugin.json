@@ -1,9 +1,9 @@
 {
-  "name": "skillsed",
-  "description": "Ed's public agent skills.",
+  "name": "animate-file-history",
+  "description": "Turn a file's git history into an animation.",
   "author": {
     "name": "Ed Harrod"
   },
-  "homepage": "https://github.com/echarrod/skillsed",
+  "homepage": "https://github.com/echarrod/animate-file-history",
   "license": "MIT"
 }

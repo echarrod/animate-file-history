@@ -1,7 +1,7 @@
-<h1 align="center">skillsed</h1>
+<h1 align="center">animate-file-history</h1>
 
 <p align="center">
-  <em>Skills by Ed</em>
+  <em>An agent skill that turns a file's git history into an animation</em>
 </p>
 
 <p align="center">
@@ -11,8 +11,6 @@
 </p>
 
 ---
-
-## animate-file-history
 
 <p align="center">
   <img src="assets/demo.gif" width="360" alt="A made-up Acme logo evolving through ten versions from 2015 to 2026: a monospace wordmark, a red playful script, a serif wordmark in a box, an inverted italic, a blue rounded square, a blue 'a' monogram, a purple-pink gradient square and circle, a teal-green circle with a play icon, and finally an outlined version. Each frame is captioned with its commit date and short sha.">
@@ -28,7 +26,7 @@
 /animate-file-history all versions of our home page
 ```
 
-### In the wild
+## In the wild
 
 <table>
   <tr>
@@ -69,7 +67,7 @@ to the one before, and stitches the rest into a GIF or MP4 with date and commit 
 Needs `git` and `ffmpeg`. SVGs need `rsvg-convert` or Chrome/Chromium; captions and pages need
 Chrome/Chromium; framework pages also need `playwright-core` (the app's own install is used if it has one).
 
-### Options
+## Options
 
 Say them in the request (`/animate-file-history our logo, 0.5s per frame, as an mp4`) and the agent passes
 them on, or run the engine by hand:
@@ -94,36 +92,36 @@ them on, or run the engine by hand:
 **Claude Code**, as two separate prompts:
 
 ```
-/plugin marketplace add echarrod/skillsed
+/plugin marketplace add echarrod/animate-file-history
 ```
 ```
-/plugin install skillsed@skillsed
+/plugin install animate-file-history@animate-file-history
 ```
 
 Or in one step on Claude Code 2.1.275 or later:
 
 ```
-/plugin install skillsed --marketplace echarrod/skillsed
+/plugin install animate-file-history --marketplace echarrod/animate-file-history
 ```
 
-Installed as a plugin, the command is namespaced: `/skillsed:animate-file-history`.
+Installed as a plugin, the command is namespaced: `/animate-file-history:animate-file-history`.
 
 **Any agent that reads `SKILL.md`** (Codex, Cursor, Gemini CLI, OpenCode, Copilot and others):
 
 ```bash
-npx skills add echarrod/skillsed
+npx skills add echarrod/animate-file-history
 ```
 
 **By hand**: clone the repo and symlink or copy a skill folder into `~/.claude/skills/` (every project) or
 a project's `.claude/skills/`. Installed this way the command is plain `/animate-file-history`.
 
 ```bash
-git clone https://github.com/echarrod/skillsed.git
-ln -s "$PWD/skillsed/skills/animate-file-history" ~/.claude/skills/animate-file-history
+git clone https://github.com/echarrod/animate-file-history.git
+ln -s "$PWD/animate-file-history/skills/animate-file-history" ~/.claude/skills/animate-file-history
 ```
 
-To link every skill in the repo at once (into `~/.claude/skills` and `~/.agents/skills`), run
-`skillsed/scripts/link-skills.sh`; re-run it after pulling new skills.
+To link it into both `~/.claude/skills` and `~/.agents/skills` at once, run
+`animate-file-history/scripts/link-skills.sh`.
 
 ## Model and effort
 
