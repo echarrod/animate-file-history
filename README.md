@@ -28,30 +28,23 @@
 
 ## In the wild
 
-<table>
-  <tr>
-    <th align="center"><a href="https://github.com/storra-eng">Storra</a></th>
-    <th align="center"><a href="https://github.com/givr-eng">Givr</a> - two repos</th>
-  </tr>
-  <tr>
-    <td align="center">
-      <img src="assets/storra-logo-history.gif" width="360" alt="The Storra logo evolving through 24 versions in 2026: a lowercase wordmark, black and red S monograms, then the folded-page mark and the Storra lockup in black and orange.">
-    </td>
-    <td align="center">
-      <img src="assets/givr-logo-history.gif" width="360" alt="The Givr logo evolving through 8 versions from July 2024 to March 2026: a green app icon with a white wordmark, a dark wordmark with a swooping g, light and dark variants, and the standalone g monogram in green and dark.">
-    </td>
-  </tr>
-  <tr>
-    <td valign="top">
-      Seven months of Storra's logo, from a lowercase wordmark through red S monograms to today's folded-page mark -
-      stitched from favicons, headers and brand lockups across 27 commits.
-    </td>
-    <td valign="top">
-      Givr's logo lives in two repos, the iOS app and the web app. Run the skill in each, then merge the frames by
-      date into one timeline: eight versions from July 2024 to March 2026, with repeated logos dropped.
-    </td>
-  </tr>
-</table>
+### [Storra](https://github.com/storra-eng)
+
+<p align="center">
+  <img src="assets/storra-logo-history.gif" width="360" alt="The Storra logo evolving through 24 versions in 2026: a lowercase wordmark, black and red S monograms, then the folded-page mark and the Storra lockup in black and orange.">
+</p>
+
+Seven months of Storra's logo, from a lowercase wordmark through red S monograms to today's folded-page mark -
+stitched from favicons, headers and brand lockups across 27 commits.
+
+### [Givr](https://github.com/givr-eng) - two repos
+
+<p align="center">
+  <img src="assets/givr-logo-history.gif" width="360" alt="The Givr logo evolving through 8 versions from July 2024 to March 2026: a green app icon with a white wordmark, a dark wordmark with a swooping g, light and dark variants, and the standalone g monogram in green and dark.">
+</p>
+
+Givr's logo lives in two repos, the iOS app and the web app. Run the skill in each, then merge the frames by
+date into one timeline: eight versions from July 2024 to March 2026, with repeated logos dropped.
 
 The agent works out which files you mean (following renames, moves and `png` → `svg` switches across the
 whole history), pulls every version out of git, renders each one, drops versions whose pixels are identical
