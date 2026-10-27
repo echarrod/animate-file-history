@@ -91,15 +91,6 @@ them on, or run the engine by hand:
 /plugin install animate-file-history --marketplace echarrod/animate-file-history
 ```
 
-On an older version, run these as two separate prompts instead:
-
-```
-/plugin marketplace add echarrod/animate-file-history
-```
-```
-/plugin install animate-file-history@animate-file-history
-```
-
 Installed as a plugin, the command is namespaced: `/animate-file-history:animate-file-history`.
 
 **Any agent that reads `SKILL.md`** (Codex, Cursor, Gemini CLI, OpenCode, Copilot and others):
