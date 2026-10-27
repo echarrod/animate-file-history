@@ -127,6 +127,45 @@ Haiku at low effort is enough for images: every model and effort setting benchma
 - `skills/<name>/scripts/` - executable helpers the skill runs.
 - `skills/<name>/references/` - supporting detail loaded on demand.
 
+## FAQ
+
+<details>
+<summary><b>Can I use it in Claude Desktop?</b></summary>
+
+<br>
+
+It depends on where the code runs. The skill needs a shell, a local git repo, `ffmpeg` and, for pages and
+captions, Chrome.
+
+- **Claude Desktop's Code tab or Cowork:** should work, since they run Claude Code against a local folder.
+  Install `ffmpeg` yourself, plus `rsvg-convert` for SVGs.
+- **Plain Claude Desktop chat or claude.ai:** no. There is no local repo or shell, so the skill has no git
+  history to read.
+
+Not yet tested in the Desktop Code tab or Cowork.
+
+</details>
+
+<details>
+<summary><b>Is it a plugin?</b></summary>
+
+<br>
+
+Yes, for Claude Code: see [Install](#install). The repo carries a plugin and marketplace manifest in
+`.claude-plugin/`.
+
+</details>
+
+<details>
+<summary><b>Does it work in Codex, Gemini CLI, Copilot CLI and others?</b></summary>
+
+<br>
+
+Any agent that reads `SKILL.md` can use it: `npx skills add echarrod/animate-file-history`. It also needs a shell
+and the tools listed above on the machine the agent runs on.
+
+</details>
+
 ## License
 
 [MIT](LICENSE)
