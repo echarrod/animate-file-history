@@ -26,6 +26,9 @@
 /animate-file-history all versions of our home page
 ```
 
+A small, cheap model such as Haiku at low effort is enough for images - the script does the heavy lifting
+([benchmarks](benchmarks/README.md)).
+
 ## In the wild
 
 ### [Storra](https://github.com/storra-eng)
@@ -82,19 +85,19 @@ them on, or run the engine by hand:
 
 ## Install
 
-**Claude Code**, as two separate prompts:
+**Claude Code** 2.1.275 or later:
+
+```
+/plugin install animate-file-history --marketplace echarrod/animate-file-history
+```
+
+On an older version, run these as two separate prompts instead:
 
 ```
 /plugin marketplace add echarrod/animate-file-history
 ```
 ```
 /plugin install animate-file-history@animate-file-history
-```
-
-Or in one step on Claude Code 2.1.275 or later:
-
-```
-/plugin install animate-file-history --marketplace echarrod/animate-file-history
 ```
 
 Installed as a plugin, the command is namespaced: `/animate-file-history:animate-file-history`.
