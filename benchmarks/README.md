@@ -30,3 +30,6 @@ Passes out of 3, and mean output tokens per run:
 - Total input is dominated by the host session's context (the system prompt and installed skill list), not by this
   skill, so it varies by setup and isn't tabulated.
 - **Not benchmarked:** page animation (screenshots per commit, framework builds), which needs more judgement.
+
+`make-demo-fixture.sh` builds the Acme wordmark history behind `assets/demo.gif` (21 versions, a mix of big redesigns and
+small tweaks), handy for checking the dedupe threshold still keeps subtle changes.

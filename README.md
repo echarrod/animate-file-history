@@ -13,7 +13,7 @@
 ---
 
 <p align="center">
-  <img src="assets/demo.gif" width="360" alt="A made-up Acme logo evolving through ten versions from 2015 to 2026: a monospace wordmark, a red playful script, a serif wordmark in a box, an inverted italic, a blue rounded square, a blue 'a' monogram, a purple-pink gradient square and circle, a teal-green circle with a play icon, and finally an outlined version. Each frame is captioned with its commit date and short sha.">
+  <img src="assets/demo.gif" width="360" alt="A made-up Acme wordmark evolving through 21 versions from 2015 to 2025: monospace in growing sizes, a red then orange script, a boxed serif with a thicker border, an inverted italic in white then gold, bold sans in blue then green, a spaced geometric sans in purple then magenta, a Didot-style serif, heavy condensed type in red then yellow, and a light then bold teal sans. Each frame is captioned with its commit date and short sha.">
 </p>
 
 <p align="center">
