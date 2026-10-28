@@ -1,5 +1,6 @@
 {
   "name": "animate-file-history",
+  "version": "1.0.0",
   "description": "Turn a file's git history into an animation.",
   "author": {
     "name": "Ed Harrod"
