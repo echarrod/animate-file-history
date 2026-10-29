@@ -20,3 +20,7 @@ The README is the public face of every skill. Any change to a skill's behaviour,
 path or examples updates `README.md` in the same commit - including the options table and the example GIFs
 in `assets/` when their output would now look different. Before committing, diff the skill's `--help` (or
 SKILL.md options) against the README and fix any drift.
+
+## Documentation vs code
+
+When a repository's documentation and its existing code disagree, follow the conventions in the existing code. In your final reply, list each inconsistency you found between the documentation and the code.
